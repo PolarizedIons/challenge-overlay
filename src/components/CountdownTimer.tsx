@@ -1,4 +1,5 @@
 import { FC, useCallback, useEffect, useRef, useState } from 'react';
+import { EventSystem } from '../event-system/EventSystem';
 import { countdownTimer } from '../state/CountdownState';
 import { settings } from '../state/SettingsState';
 
@@ -21,15 +22,15 @@ export const CountdownTimer: FC = () => {
     const text = Math.round(countdownDuration * progress);
 
     ref.current.style.width = `${width}px`;
-    setText(`${text}s`);
+    setText(`${text}`);
   }, [countingTowards, countdownDuration]);
 
   useEffect(() => {
     const handler = () => {
       const now = new Date().getTime();
       if (countingTowards < now) {
+        if (countingTowards > 0) EventSystem.fireEvent('round-end', null);
         if (ref.current) ref.current.style.width = '0px';
-        setText('');
         return;
       }
 
@@ -43,7 +44,7 @@ export const CountdownTimer: FC = () => {
   return (
     <>
       <div ref={ref} className="bg-red-600 h-[48px] w-full" />
-      <div className="absolute top-0 left-0 right-0 text-center text-4xl text-shadow">
+      <div className="absolute top-0 left-0 right-0 text-center text-4xl">
         {text}
       </div>
     </>
