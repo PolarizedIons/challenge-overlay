@@ -9,7 +9,8 @@
   },
   "dependencies": {
     "react": "^18.2.0",
-    "react-dom": "^18.2.0"
+    "react-dom": "^18.2.0",
+    "simpler-state": "^1.2.0"
   },
   "devDependencies": {
     "@snowpack/plugin-dotenv": "^2.1.0",

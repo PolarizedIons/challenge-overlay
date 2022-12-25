@@ -176,7 +176,7 @@
     core-js-pure "^3.25.1"
     regenerator-runtime "^0.13.11"
 
-"@babel/runtime@^7.10.2", "@babel/runtime@^7.12.5":
+"@babel/runtime@^7.10.2", "@babel/runtime@^7.12.5", "@babel/runtime@^7.13.10":
   version "7.20.7"
   resolved "https://registry.yarnpkg.com/@babel/runtime/-/runtime-7.20.7.tgz#fcb41a5a70550e04a7b708037c7c32f7f356d8fd"
   integrity sha512-UF0tvkUtxwAgZ5W/KrkHf0Rn0fdnLDU9ScxBrEVNUprE/MzirjK4MJUX1/BVDv00Sv8cljtukVK1aky++X1SjQ==
@@ -4324,6 +4324,13 @@ signal-exit@^3.0.0, signal-exit@^3.0.2, signal-exit@^3.0.3:
   version "3.0.7"
   resolved "https://registry.yarnpkg.com/signal-exit/-/signal-exit-3.0.7.tgz#a9a1767f8af84155114eaabd73f99273c8f59ad9"
   integrity sha512-wnD2ZE+l+SPC/uoS0vXeE9L1+0wuaMqKlfz9AMUo38JsyLSBWSFcHR1Rri62LZc12vLr1gb3jl7iwQhgwpAbGQ==
+
+simpler-state@^1.2.0:
+  version "1.2.0"
+  resolved "https://registry.yarnpkg.com/simpler-state/-/simpler-state-1.2.0.tgz#fd78f0416e741d75b5b0ff70d8b0c46722e062c5"
+  integrity sha512-Gd6rlc3Rq0qQm78bGg+4qVJUvOPr874aN2LBxawQV71Q0f0Ub2HVqR4AUXnP26TgCL/PaQ/7yisbdJD8NJ8+oA==
+  dependencies:
+    "@babel/runtime" "^7.13.10"
 
 skypack@^0.3.2:
   version "0.3.2"
