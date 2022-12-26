@@ -1,3 +1,7 @@
+import nodePolyfills from 'rollup-plugin-polyfill-node';
+import resolve from '@rollup/plugin-node-resolve';
+import commonjs from '@rollup/plugin-commonjs';
+
 /** @type {import("snowpack").SnowpackUserConfig } */
 export default {
   mount: {
@@ -23,13 +27,24 @@ export default {
   optimize: {
     bundle: true,
     minify: true,
-    target: 'es2018',
+    target: 'es2020',
     sourcemap: 'external',
-    preload: true,
     splitting: true,
     treeshake: true,
   },
-  packageOptions: {},
+  packageOptions: {
+    polyfillNode: false,
+    rollup: {
+      plugins: [
+        commonjs(),
+        // nodePolyfills(),
+        resolve({
+          browser: true,
+          preferBuiltins: true,
+        }),
+      ],
+    },
+  },
   devOptions: {
     tailwindConfig: './tailwind.config.js',
   },
