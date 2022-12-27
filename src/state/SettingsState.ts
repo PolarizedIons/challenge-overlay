@@ -4,8 +4,9 @@ import { urlPersistence } from "./UrlStorage";
 const defaultSettings = {
   countdownDurationSec: 30,
   breakBetweenRoundsSec: 3,
-  twitchChannel: "portalrunner",
+  twitchChannel: "polarizedions",
   voteCommand: "!vote",
+  numberOptions: 4,
   options: [
     "Do thing A",
     "Do thing B",

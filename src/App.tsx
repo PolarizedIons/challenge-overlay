@@ -1,5 +1,6 @@
 import { FC, useEffect, useState } from "react";
 import { CountdownTimer } from "./components/CountdownTimer";
+import { VoteOptions } from "./components/VoteOptions";
 import { VoterDisplay } from "./components/VoterDisplay";
 import { EventSystem } from "./event-system/EventSystem";
 import { TwitchProvider } from "./providers/TwitchProvider";
@@ -9,28 +10,12 @@ import { resetVotes } from "./state/VotesState";
 
 export const App: FC = () => {
   const [waiting, setWaiting] = useState(true);
-  const breakBetweenRounds = settings.use(
-    (value) => value.breakBetweenRoundsSec
-  );
 
   useEffect(() => {
     if (!waiting) {
       startCountdownTimer();
     }
   }, [waiting]);
-
-  useEffect(() => {
-    const handler = () => {
-      setTimeout(() => {
-        resetVotes();
-        startCountdownTimer();
-      }, breakBetweenRounds * 1000);
-    };
-
-    EventSystem.listen("round-end", handler);
-
-    return () => EventSystem.stopListening("round-end", handler);
-  }, [breakBetweenRounds]);
 
   if (waiting) {
     return (
@@ -46,6 +31,7 @@ export const App: FC = () => {
   return (
     <div className="w-full min-h-screen text-white text-shadow">
       <CountdownTimer />
+      <VoteOptions />
       <VoterDisplay />
     </div>
   );

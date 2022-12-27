@@ -1,4 +1,12 @@
-import { FC, PropsWithChildren, useCallback, useEffect, useState } from "react";
+import {
+  FC,
+  PropsWithChildren,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { settings } from "../state/SettingsState";
 import { addVoter, votes } from "../state/VotesState";
 import tmi, { ChatUserstate } from "tmi.js";
@@ -6,8 +14,28 @@ import { EventSystem } from "../event-system/EventSystem";
 
 export const TwitchProvider: FC<PropsWithChildren> = ({ children }) => {
   const channel = settings.use((value) => value.twitchChannel);
+  const numberOptions = settings.use((value) => value.numberOptions);
   const voteCommand = settings.use((value) => value.voteCommand);
   const usingAltVoteNumbers = votes.use((value) => value.altVoteNumbers);
+  const roundBusy = useRef(true);
+
+  useEffect(() => {
+    const startHandler = () => {
+      roundBusy.current = true;
+    };
+
+    const endHandler = () => {
+      roundBusy.current = false;
+    };
+
+    EventSystem.listen("round-start", startHandler);
+    EventSystem.listen("round-end", endHandler);
+
+    return () => {
+      EventSystem.stopListening("round-start", startHandler);
+      EventSystem.stopListening("round-end", endHandler);
+    };
+  }, []);
 
   const [tmiClient] = useState(() => {
     const client = new tmi.Client({
@@ -19,13 +47,17 @@ export const TwitchProvider: FC<PropsWithChildren> = ({ children }) => {
     return client;
   });
 
+  const validOptions = useMemo(() => {
+    return new Array(numberOptions)
+      .fill(0)
+      .map((_, i) => i + (usingAltVoteNumbers ? numberOptions + 1 : 1));
+  }, [numberOptions, usingAltVoteNumbers]);
+
   const validateVote = useCallback(
     (vote: number) => {
-      return usingAltVoteNumbers
-        ? [5, 6, 7, 8].includes(vote)
-        : [1, 2, 3, 4].includes(vote);
+      return roundBusy.current && validOptions.includes(vote);
     },
-    [usingAltVoteNumbers]
+    [validOptions]
   );
 
   const onChat = useCallback(
