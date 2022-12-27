@@ -1,73 +1,38 @@
-import { FC, useCallback, useEffect, useRef, useState } from 'react';
-import { settings } from '../state/SettingsState';
-import { votes } from '../state/VotesState';
-import tmi, { ChatUserstate } from 'tmi.js';
-import { EventSystem } from '../event-system/EventSystem';
+import { FC, useEffect, useState } from "react";
+import { EventSystem } from "../event-system/EventSystem";
+import { Events } from "../event-system/Events";
+import { useTransition, animated } from "@react-spring/web";
 
-const Voter: FC<{ name: string }> = ({ name }) => {
-  return <div>{name}</div>;
-};
+type VoteEvent = Events["person-voted"];
+const MAX_SHOWN = 5;
 
 export const VoterDisplay: FC = () => {
-  const [voters, setVoters] = useState<string[]>([]);
-  const channel = settings.use((value) => value.twitchChannel);
-  const voteCommand = settings.use((value) => value.voteCommand);
-  const usingAltVoteNumbers = votes.use((value) => value.altVoteNumbers);
-
-  const [tmiClient] = useState(
-    () =>
-      new tmi.Client({
-        channels: [channel],
-      }),
-  );
-
-  const validateVote = useCallback(
-    (vote: number) => {
-      return usingAltVoteNumbers
-        ? [5, 6, 7, 8].includes(vote)
-        : [1, 2, 3, 4].includes(vote);
-    },
-    [usingAltVoteNumbers],
-  );
-
-  const onChat = useCallback(
-    (channel: string, tags: ChatUserstate, message: string, self: boolean) => {
-      if (!message.startsWith(voteCommand)) {
-        return;
-      }
-
-      const voteForRaw = message.substring(voteCommand.length).trim();
-      if (!/[0-9]/.test(voteForRaw)) {
-        return;
-      }
-
-      const vote = parseInt(voteForRaw, 10);
-      if (!validateVote(vote)) {
-        return;
-      }
-
-      const name = tags['display-name']!;
-      EventSystem.fireEvent('person-voted', { name, vote });
-      setVoters((prev) => [...prev, name]);
-    },
-    [],
-  );
+  const [voters, setVoters] = useState<VoteEvent[]>([]);
+  const transitions = useTransition(voters, {
+    from: { opacity: 0, height: "0px", transform: "translateY(10px)" },
+    enter: { opacity: 1, height: "24px", transform: "translateY(0px)" },
+    leave: { opacity: 0, transform: "translateY(-10px)" },
+  });
 
   useEffect(() => {
-    tmiClient.connect();
+    const handler = (event: VoteEvent) => {
+      setVoters((prev) => [...prev, event].slice(-1 * MAX_SHOWN));
+    };
 
-    tmiClient.on('chat', onChat);
+    EventSystem.listen("person-voted", handler);
 
     return () => {
-      tmiClient.removeAllListeners();
-      tmiClient.disconnect();
+      EventSystem.stopListening("person-voted", handler);
     };
-  }, [onChat]);
+  }, []);
 
   return (
-    <div className="absolute bottom-0 right-0">
-      {voters.map((name) => (
-        <Voter key={name} name={name} />
+    <div className="absolute bottom-4 right-4">
+      {transitions((style, item) => (
+        <animated.div style={style}>
+          <span className="text-blue-600">{item.name}</span> voted for{" "}
+          <span className="text-blue-600">{item.vote}</span>
+        </animated.div>
       ))}
     </div>
   );
