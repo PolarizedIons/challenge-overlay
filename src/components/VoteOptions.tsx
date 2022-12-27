@@ -3,8 +3,8 @@ import { FC, useCallback, useEffect, useMemo, useState } from "react";
 import { EventSystem } from "../event-system/EventSystem";
 import { startCountdownTimer } from "../state/CountdownState";
 import { settings } from "../state/SettingsState";
-import { resetVotes, votes } from "../state/VotesState";
-import { ObjectEntries } from "../Utils";
+import { resetVotes, setWinningOption, votes } from "../state/VotesState";
+import { ObjectEntries, ObjectKeys } from "../Utils";
 
 export const VoteOptions: FC = () => {
   const breakBetweenRounds = settings.use(
@@ -33,11 +33,36 @@ export const VoteOptions: FC = () => {
     setCurrentOptions(newVoteOptions);
   }, [allVoteOptions, usingAltNumbers, numberOptions]);
 
+  const currentVotes = useMemo(() => {
+    return Object.values(currentVotesRaw).reduce((acc, curr) => {
+      acc[curr] ? ++acc[curr] : (acc[curr] = 1);
+      return acc;
+    }, {} as Record<number, number>);
+  }, [currentVotesRaw]);
+
   useEffect(() => {
     resetOptions();
+  }, [resetOptions]);
 
+  useEffect(() => {
     const handler = () => {
       setTimeout(() => {
+        const maxVotes =
+          Object.keys(currentVotes).length > 0
+            ? Math.max(...Object.values(currentVotes))
+            : 0;
+        let winningOptionsIds = ObjectEntries(currentVotes)
+          .filter(([_, votes]) => votes === maxVotes)
+          .map(([id, _]) => id);
+        if (winningOptionsIds.length === 0) {
+          winningOptionsIds = ObjectKeys(currentVoteOptions);
+        }
+        const winningOptionId =
+          winningOptionsIds[
+            Math.floor(Math.random() * winningOptionsIds.length)
+          ];
+        setWinningOption(currentVoteOptions[winningOptionId]);
+
         resetVotes();
         resetOptions();
 
@@ -50,14 +75,7 @@ export const VoteOptions: FC = () => {
     EventSystem.listen("round-end", handler);
 
     return () => EventSystem.stopListening("round-end", handler);
-  }, [breakBetweenRounds, resetOptions]);
-
-  const currentVotes = useMemo(() => {
-    return Object.values(currentVotesRaw).reduce((acc, curr) => {
-      acc[curr] ? ++acc[curr] : (acc[curr] = 1);
-      return acc;
-    }, {} as Record<number, number>);
-  }, [currentVotesRaw]);
+  }, [breakBetweenRounds, resetOptions, currentVotes, currentVoteOptions]);
 
   const totalVotes = useMemo(() => {
     return Object.values(currentVotes).reduce((prev, curr) => prev + curr, 0);

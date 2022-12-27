@@ -1,5 +1,6 @@
 import { FC, useEffect, useState } from "react";
 import { CountdownTimer } from "./components/CountdownTimer";
+import { CurrentObjective } from "./components/CurrentObjective";
 import { VoteOptions } from "./components/VoteOptions";
 import { VoterDisplay } from "./components/VoterDisplay";
 import { EventSystem } from "./event-system/EventSystem";
@@ -31,6 +32,7 @@ export const App: FC = () => {
   return (
     <div className="w-full min-h-screen text-white text-shadow">
       <CountdownTimer />
+      <CurrentObjective />
       <VoteOptions />
       <VoterDisplay />
     </div>
