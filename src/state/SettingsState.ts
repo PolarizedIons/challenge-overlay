@@ -8,9 +8,9 @@ const defaultSettings = {
   voteCommand: "!vote",
   numberOptions: 4,
   options: [
-    "Do thing A",
-    "Do thing B",
-    "Avoid thing C",
+    "Do a flip",
+    "Pushups time",
+    "Avoid saying a swear word for 3 mins",
     "Pet Cat",
     "Avoid death",
     "Kill Glados",

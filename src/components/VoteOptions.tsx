@@ -23,7 +23,7 @@ export const VoteOptions: FC = () => {
     const newVoteOptions: Record<number, string> = {};
 
     for (let i = 0; i < numberOptions; i++) {
-      newVoteOptions[i + (!usingAltNumbers ? numberOptions + 1 : 1)] =
+      newVoteOptions[i + (usingAltNumbers ? numberOptions + 1 : 1)] =
         optionsToChooseFrom.splice(
           Math.floor(Math.random() * optionsToChooseFrom.length),
           1
@@ -98,10 +98,7 @@ export const VoteOptions: FC = () => {
             style={{ width: item.votes + "%" }}
           />
           <span className="flex justify-between items-center gap-4 w-full z-10 relative">
-            <span>#{item.id}</span>{" "}
-            <span>
-              {item.option} {item.votes}%
-            </span>
+            <span>#{item.id}</span> <span>{item.option}</span>
           </span>
         </animated.div>
       ))}
